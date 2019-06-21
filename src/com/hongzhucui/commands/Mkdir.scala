@@ -24,20 +24,32 @@ class Mkdir(name : String) extends Command {
     name.contains(".")
   }
 
+  def updateStructure(currentDirectory: Directory, path: List[String], newEntry: Directory) : Directory = {
+    if (path.isEmpty) currentDirectory.addEntry(newEntry )
+    else {
+      val oldEntry = currentDirectory.findEntry(path.head).asDirectory
+      currentDirectory.replaceEntry(oldEntry.name, updateStructure(oldEntry, path.tail, newEntry))
+    }
+  }
+
+
+
   def doMkdir(state: State, name: String): State = {
     val wd = state.wd
-    val fullPath = wd.path
 
     // get all the directory in the full path
+    val allDirsInPath = wd.getAllFoldersInPath
 
     // create new directory entry in the wd
+    val newDir = Directory.empty(wd.path, name)
 
     // update the directory structure staring from the root
+    val newRoot = updateStructure(state.root, allDirsInPath, newDir)
 
     // find new working directory instance given wd's full path, in the new directory structure
+    val newWd = newRoot.findDescendant(allDirsInPath)
 
-
-
+    State(newRoot, newWd)
   }
 
 
