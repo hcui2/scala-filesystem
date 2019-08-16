@@ -34,10 +34,14 @@ class Directory (override val parentPath: String, override val name: String, val
     else findEntry(path.head).asDirectory.findDescendant(path.tail)
   }
 
-  override def asDirectory: Directory = this
+  def isRoot: Boolean = parentPath.isEmpty
 
+  override def asDirectory: Directory = this
   override def asFile: File = throw new FileSystemException("a directory cannot be converted to file ")
   override def getType: String = "Directory"
+
+  override def isDirectory: Boolean = true
+  override def isFile: Boolean = false
 }
 
 object Directory {
